@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò Chơi Cò Quay Nga</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; /*background-color: #222; color: white;*/ }
+        .container { margin-top: 50px; }
+        .status { font-size: 20px; margin: 20px; }
+        button { font-size: 18px; padding: 10px; margin: 5px; cursor: pointer; }
+        img { width: 200px; height: auto; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trò Chơi Cò Quay Nga</h1>
+        <p class="status">Nhấn 'Nhét Đạn & Quay Ổ Đạn' để bắt đầu.</p>
+        <p>Lượt đã bắn: <span id="safeShots">0</span>/6</p>
+        <button id="loadSpinButton" onclick="spinChamber()">Nhét Đạn & Quay Ổ Đạn</button>
+        <button id="cockButton" onclick="cockGun()" style="display:none;">Lên Cò</button>
+        <button id="shootButton" onclick="shootGun()" style="display:none;">Bắn</button>
+        <button id="resetButton" onclick="resetGame()" style="display:none;">Chơi Lại</button>
+        <img id="gunImage" src="gun.png" alt="Súng">
+    </div>
+    
+    <audio id="spinSound" src="spin.mp3"></audio>
+    <audio id="cockSound" src="cock.mp3"></audio>
+    <audio id="shootSound" src="shoot.mp3"></audio>
+    <audio id="emptySound" src="empty.mp3"></audio>
+    <audio id="boomSound" src="boom.mp3"></audio>
+    
+    <script>
+        let chamber = [false, false, false, false, false, false];
+        let currentChamber = 0;
+        let isCocked = false;
+        let safeShots = 0;
+
+        function spinChamber() {
+            chamber.fill(false);
+            let bulletIndex = Math.floor(Math.random() * 6);
+            chamber[bulletIndex] = true;
+            currentChamber = 0;
+            safeShots = 0;
+            isCocked = false;
+            document.getElementById("loadSpinButton").style.display = "none";
+            updateStatus("Đang lên đạn...");
+            document.getElementById("spinSound").play();
+            
+            setTimeout(() => {
+                document.getElementById("cockButton").style.display = "inline";
+                document.getElementById("shootButton").style.display = "inline";
+                document.getElementById("resetButton").style.display = "none";
+                updateStatus("Ổ đạn đã quay. Nhấn 'Lên Cò' hoặc 'Bắn'.");
+                document.getElementById("safeShots").textContent = safeShots;
+            }, 2000);
+        }
+
+        function cockGun() {
+            if (!isCocked) {
+                isCocked = true;
+                updateStatus("Súng đã lên cò. Nhấn 'Bắn' để bắn.");
+                document.getElementById("cockButton").style.display = "none";
+                document.getElementById("cockSound").play();
+            }
+        }
+
+        function shootGun() {
+            if (!isCocked) {
+                updateStatus("Súng đã lên cò...");
+                isCocked = true;
+                document.getElementById("cockSound").play();
+                setTimeout(executeShot, 2000);
+            } else {
+                executeShot();
+            }
+        }
+
+        function executeShot() {
+            if (chamber[currentChamber]) {
+                updateStatus("Bùm! Bạn đã trúng đạn! Trò chơi kết thúc.");
+                document.getElementById("resetButton").style.display = "inline";
+                document.getElementById("cockButton").style.display = "none";
+                document.getElementById("shootButton").style.display = "none";
+                document.getElementById("boomSound").play();
+                document.getElementById("gunImage").src = "boom.png";
+            } else {
+                updateStatus("Tạch! Bạn an toàn.");
+                safeShots++;
+                document.getElementById("safeShots").textContent = safeShots;
+                currentChamber = (currentChamber + 1) % 6;
+                isCocked = false;
+                document.getElementById("cockButton").style.display = "inline";
+                document.getElementById("emptySound").play();
+            }
+        }
+
+        function resetGame() {
+            document.getElementById("loadSpinButton").style.display = "inline";
+            document.getElementById("cockButton").style.display = "none";
+            document.getElementById("shootButton").style.display = "none";
+            document.getElementById("resetButton").style.display = "none";
+            document.getElementById("gunImage").src = "gun.png";
+            updateStatus("Nhấn 'Nhét Đạn & Quay Ổ Đạn' để bắt đầu.");
+        }
+
+        function updateStatus(message) {
+            document.querySelector(".status").textContent = message;
+        }
+    </script>
+</body>
+</html>

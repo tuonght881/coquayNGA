@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolver Simulator</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #222;
+            color: white;
+        }
+        .gun {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            background: gray;
+            border-radius: 10px;
+        }
+        .cylinder {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: black;
+            border-radius: 50%;
+            top: 20px;
+            left: 50px;
+            transition: transform 0.5s ease-in-out;
+        }
+        .hammer {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background: darkgray;
+            top: -10px;
+            left: 150px;
+            transition: transform 0.3s ease-in-out;
+        }
+        .trigger {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: darkgray;
+            border-radius: 50%;
+            bottom: 10px;
+            left: 170px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px;
+            border: none;
+            background: orange;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="gun">
+        <div class="cylinder" id="cylinder"></div>
+        <div class="hammer" id="hammer"></div>
+        <div class="trigger" id="trigger"></div>
+    </div>
+    <div class="buttons">
+        <button onclick="reload()">Nạp đạn</button>
+        <button onclick="spinCylinder()">Xoay ổ đạn</button>
+        <button onclick="cockHammer()">Lên cò</button>
+        <button onclick="fire()">Bóp cò</button>
+    </div>
+    <audio id="gunshot" src="https://www.soundjay.com/gun/gunshot-01.mp3"></audio>
+    <script>
+        let hasBullet = false;
+        let isCocked = false;
+
+        function reload() {
+            hasBullet = true;
+            alert("Đạn đã nạp!");
+        }
+
+        function spinCylinder() {
+            document.getElementById("cylinder").style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+        }
+
+        function cockHammer() {
+            if (!hasBullet) {
+                alert("Không có đạn!");
+                return;
+            }
+            isCocked = true;
+            document.getElementById("hammer").style.transform = "rotate(-30deg)";
+        }
+
+        function fire() {
+            if (!isCocked) {
+                alert("Bạn phải lên cò trước!");
+                return;
+            }
+            document.getElementById("hammer").style.transform = "rotate(0deg)";
+            document.getElementById("trigger").style.transform = "scale(0.8)";
+            setTimeout(() => {
+                document.getElementById("trigger").style.transform = "scale(1)";
+                if (hasBullet) {
+                    document.getElementById("gunshot").play();
+                    alert("Bùm! Súng đã bắn!");
+                    hasBullet = false;
+                } else {
+                    alert("Tạch! Không có đạn!");
+                }
+            }, 200);
+        }
+    </script>
+</body>
+</html>
