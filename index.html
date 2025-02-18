@@ -5,14 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trò Chơi Cò Quay Nga</title>
     <style>
-        .ui{
-            height: 190px;
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
         }
-        body { text-align: center; font-family: Arial, sans-serif; /*background-color: #222; color: white;*/ }
-        .container { margin-top: 50px; }
-        .status { font-size: 20px; margin: 20px; }
-        button { font-size: 18px; padding: 10px; margin: 5px; cursor: pointer; }
 
+        .container {
+            /*margin-top: 20px;*/
+            padding: 5px;
+        }
+
+        .ui {
+            height: 200px;
+            margin: 20px;
+        }
+
+        .status {
+            font-size: 18px;
+            margin: 20px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 12px 20px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Cấu hình ảnh */
+        #imageContainer img {
+            width: auto;
+            height: auto;
+            transition: 0.3s ease-in-out;
+            max-width: 100%; /* Ảnh sẽ không vượt quá chiều rộng của container */
+        }
+
+        /* Media query để tối ưu giao diện trên các thiết bị di động */
+        @media (max-width: 600px) {
+            .status {
+                font-size: 16px;
+            }
+
+            button {
+                font-size: 18px;
+                padding: 10px 15px;
+            }
+
+            /* Điều chỉnh ảnh trên điện thoại */
+            #imageContainer img {
+                width: 100%; /* Ảnh sẽ chiếm toàn bộ chiều ngang màn hình điện thoại */
+            }
+        }
+
+        /* Đối với các màn hình máy tính */
+        @media (min-width: 601px) {
+            #imageContainer img {
+                max-height: 660px;
+                width: auto; /* Ảnh giữ kích thước nguyên bản */
+            }
+        }
     </style>
 </head>
 <body>
@@ -76,24 +139,19 @@
                 updateStatus("Súng đã lên cò. Nhấn 'Bắn' để bắn.");
                 document.getElementById("cockButton").style.display = "none";
                 document.getElementById("cockSound").play();
-
-                // Hiển thị gaichot.png cho đến khi bắn
                 document.getElementById("anacondaImage").src = "gaichot.png";
             }
         }
 
         function shootGun() {
             if (!isCocked) {
-                // Nếu chưa lên cò, hiển thị bopco.png trước
                 updateStatus("Súng bóp cò...");
                 document.getElementById("anacondaImage").src = "bopco.png";
                 document.getElementById("cockSound").play();
-
                 setTimeout(() => {
-                    // Hiển thị gaichotbopco.png sau 0.5s
                     document.getElementById("anacondaImage").src = "gaichotbopco.png";
                     isCocked = true; // Giả lập việc chốt đã nhảy
-                    setTimeout(executeShot, 500); // 0.5s sau thực hiện bắn
+                    setTimeout(executeShot, 500); 
                 }, 500);
             } else {
                 executeShot();
@@ -101,20 +159,15 @@
         }
 
         function executeShot() {
-            // Hiển thị bopco.png trong 0.5 giây
-            //document.getElementById("anacondaImage").src = "bopco.png";
             setTimeout(() => {
                 if (chamber[currentChamber]) {
-                    // Trúng đạn -> Hiển thị fire.png
                     updateStatus("Bùm! Bạn đã trúng đạn! Trò chơi kết thúc.");
                     document.getElementById("resetButton").style.display = "inline";
                     document.getElementById("cockButton").style.display = "none";
                     document.getElementById("shootButton").style.display = "none";
                     document.getElementById("boomSound").play();
-
                     document.getElementById("anacondaImage").src = "fire.png";
                 } else {
-                    // Không trúng đạn -> Quay về anaconda.png
                     updateStatus("Tạch! Bạn an toàn.");
                     safeShots++;
                     document.getElementById("safeShots").textContent = safeShots;
@@ -122,7 +175,6 @@
                     isCocked = false;
                     document.getElementById("cockButton").style.display = "inline";
                     document.getElementById("emptySound").play();
-
                     document.getElementById("anacondaImage").src = "anaconda.png";
                 }
             }, 500);
@@ -134,17 +186,14 @@
             document.getElementById("shootButton").style.display = "none";
             document.getElementById("resetButton").style.display = "none";
             updateStatus("Nhấn 'Nhét Đạn & Quay Ổ Đạn' để bắt đầu.");
-            safeShots=0;
-            // Đặt lại hình ảnh về anaconda.png
+            safeShots = 0;
             document.getElementById("safeShots").textContent = safeShots;
             document.getElementById("anacondaImage").src = "anaconda.png";
-            
         }
 
         function updateStatus(message) {
             document.querySelector(".status").textContent = message;
         }
-
     </script>
 </body>
 </html>
