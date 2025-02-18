@@ -5,23 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trò Chơi Cò Quay Nga</title>
     <style>
+        .ui{
+            height: 190px;
+        }
         body { text-align: center; font-family: Arial, sans-serif; /*background-color: #222; color: white;*/ }
         .container { margin-top: 50px; }
         .status { font-size: 20px; margin: 20px; }
         button { font-size: 18px; padding: 10px; margin: 5px; cursor: pointer; }
-        img { width: 200px; height: auto; margin-top: 20px; }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Trò Chơi Cò Quay Nga</h1>
-        <p class="status">Nhấn 'Nhét Đạn & Quay Ổ Đạn' để bắt đầu.</p>
-        <p>Lượt đã bắn: <span id="safeShots">0</span>/6</p>
-        <button id="loadSpinButton" onclick="spinChamber()">Nhét Đạn & Quay Ổ Đạn</button>
-        <button id="cockButton" onclick="cockGun()" style="display:none;">Lên Cò</button>
-        <button id="shootButton" onclick="shootGun()" style="display:none;">Bắn</button>
-        <button id="resetButton" onclick="resetGame()" style="display:none;">Chơi Lại</button>
-        <img id="gunImage" src="gun.png" alt="Súng">
+        <div class="ui">
+            <h1>Trò Chơi Cò Quay Nga</h1>
+            <p class="status">Nhấn 'Nhét Đạn & Quay Ổ Đạn' để bắt đầu.</p>
+            <p>Lượt đã bắn: <span id="safeShots">0</span>/6</p>
+            <button id="loadSpinButton" onclick="spinChamber()">Nhét Đạn & Quay Ổ Đạn</button>
+            <button id="cockButton" onclick="cockGun()" style="display:none;">Lên Cò</button>
+            <button id="shootButton" onclick="shootGun()" style="display:none;">Bắn</button>
+            <button id="resetButton" onclick="resetGame()" style="display:none;">Chơi Lại</button>
+        </div>
+
+        <div id="imageContainer">
+            <img id="anacondaImage" src="anaconda.png" alt="Anaconda">
+        </div>
     </div>
     
     <audio id="spinSound" src="spin.mp3"></audio>
@@ -46,8 +54,14 @@
             document.getElementById("loadSpinButton").style.display = "none";
             updateStatus("Đang lên đạn...");
             document.getElementById("spinSound").play();
-            
+
+            // Thay đổi hình ảnh theo thứ tự trong vòng 2 giây
+            setTimeout(() => document.getElementById("anacondaImage").src = "bullet1.png", 200);
+            setTimeout(() => document.getElementById("anacondaImage").src = "bullet2.png", 600);
+            setTimeout(() => document.getElementById("anacondaImage").src = "bullet3.png", 1000);
+            setTimeout(() => document.getElementById("anacondaImage").src = "anacondaspin.png", 1400);
             setTimeout(() => {
+                document.getElementById("anacondaImage").src = "anaconda.png"; 
                 document.getElementById("cockButton").style.display = "inline";
                 document.getElementById("shootButton").style.display = "inline";
                 document.getElementById("resetButton").style.display = "none";
@@ -62,37 +76,56 @@
                 updateStatus("Súng đã lên cò. Nhấn 'Bắn' để bắn.");
                 document.getElementById("cockButton").style.display = "none";
                 document.getElementById("cockSound").play();
+
+                // Hiển thị gaichot.png cho đến khi bắn
+                document.getElementById("anacondaImage").src = "gaichot.png";
             }
         }
 
         function shootGun() {
             if (!isCocked) {
-                updateStatus("Súng đã lên cò...");
-                isCocked = true;
+                // Nếu chưa lên cò, hiển thị bopco.png trước
+                updateStatus("Súng bóp cò...");
+                document.getElementById("anacondaImage").src = "bopco.png";
                 document.getElementById("cockSound").play();
-                setTimeout(executeShot, 2000);
+
+                setTimeout(() => {
+                    // Hiển thị gaichotbopco.png sau 0.5s
+                    document.getElementById("anacondaImage").src = "gaichotbopco.png";
+                    isCocked = true; // Giả lập việc chốt đã nhảy
+                    setTimeout(executeShot, 500); // 0.5s sau thực hiện bắn
+                }, 500);
             } else {
                 executeShot();
             }
         }
 
         function executeShot() {
-            if (chamber[currentChamber]) {
-                updateStatus("Bùm! Bạn đã trúng đạn! Trò chơi kết thúc.");
-                document.getElementById("resetButton").style.display = "inline";
-                document.getElementById("cockButton").style.display = "none";
-                document.getElementById("shootButton").style.display = "none";
-                document.getElementById("boomSound").play();
-                document.getElementById("gunImage").src = "boom.png";
-            } else {
-                updateStatus("Tạch! Bạn an toàn.");
-                safeShots++;
-                document.getElementById("safeShots").textContent = safeShots;
-                currentChamber = (currentChamber + 1) % 6;
-                isCocked = false;
-                document.getElementById("cockButton").style.display = "inline";
-                document.getElementById("emptySound").play();
-            }
+            // Hiển thị bopco.png trong 0.5 giây
+            //document.getElementById("anacondaImage").src = "bopco.png";
+            setTimeout(() => {
+                if (chamber[currentChamber]) {
+                    // Trúng đạn -> Hiển thị fire.png
+                    updateStatus("Bùm! Bạn đã trúng đạn! Trò chơi kết thúc.");
+                    document.getElementById("resetButton").style.display = "inline";
+                    document.getElementById("cockButton").style.display = "none";
+                    document.getElementById("shootButton").style.display = "none";
+                    document.getElementById("boomSound").play();
+
+                    document.getElementById("anacondaImage").src = "fire.png";
+                } else {
+                    // Không trúng đạn -> Quay về anaconda.png
+                    updateStatus("Tạch! Bạn an toàn.");
+                    safeShots++;
+                    document.getElementById("safeShots").textContent = safeShots;
+                    currentChamber = (currentChamber + 1) % 6;
+                    isCocked = false;
+                    document.getElementById("cockButton").style.display = "inline";
+                    document.getElementById("emptySound").play();
+
+                    document.getElementById("anacondaImage").src = "anaconda.png";
+                }
+            }, 500);
         }
 
         function resetGame() {
@@ -100,13 +133,18 @@
             document.getElementById("cockButton").style.display = "none";
             document.getElementById("shootButton").style.display = "none";
             document.getElementById("resetButton").style.display = "none";
-            document.getElementById("gunImage").src = "gun.png";
             updateStatus("Nhấn 'Nhét Đạn & Quay Ổ Đạn' để bắt đầu.");
+            safeShots=0;
+            // Đặt lại hình ảnh về anaconda.png
+            document.getElementById("safeShots").textContent = safeShots;
+            document.getElementById("anacondaImage").src = "anaconda.png";
+            
         }
 
         function updateStatus(message) {
             document.querySelector(".status").textContent = message;
         }
+
     </script>
 </body>
 </html>
